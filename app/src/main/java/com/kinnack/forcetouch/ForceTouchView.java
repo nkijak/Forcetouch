@@ -113,9 +113,14 @@ public class ForceTouchView extends View {
     }
 
     private Vibrator vib = (Vibrator)getContext().getSystemService(Context.VIBRATOR_SERVICE);
+    boolean touched = false;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
+        if (touched &&  (event.getAction() == MotionEvent.ACTION_UP)) {
+            Log.d("ForceTouchView", "Reset");
+            touched = false;
+        }
         if (event.getPressure() > .89) {
 
             int size = event.getHistorySize();
@@ -125,14 +130,15 @@ public class ForceTouchView extends View {
                 for (int i = size; i > 0; i--) {
                     Log.d("ForceTouchView", (i - 1) + "--" + event.getHistoricalPressure(i - 1));
                 }
-                
-                if (delta > 0.015) {
+
+                if (!touched && delta > 0.015) {
                     Toast.makeText(this.getContext(), "Force touch", Toast.LENGTH_SHORT).show();
-                    vib.vibrate(250);
+                    vib.vibrate(150);
+                    touched = true;
                 }
             }
         } else {
-            Log.d("ForceTouchView", "Touch event " + event.getPressure() + ":" + event.getOrientation());
+            Log.d("ForceTouchView", "Touch event " + event.getPressure() + ":" + event.getOrientation() + ":" + event.getAction() + "("+MotionEvent.ACTION_UP+")" );
 
 
         }
